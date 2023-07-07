@@ -1,0 +1,24 @@
+version: '3'
+services:
+  ap:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app
+    container_name: AP
+    restart: always
+    networks:
+    - ap
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: nginx
+    container_name: AP-nginx
+    restart: always
+    ports:
+    - 8000:80
+    networks:
+    - ap
+networks:
+  ap:

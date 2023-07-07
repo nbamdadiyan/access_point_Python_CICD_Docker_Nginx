@@ -1,0 +1,27 @@
+stages:
+  - build
+  - deploy
+
+
+build_staging:
+  stage: build
+  variables:
+    APP_ENV: "staging"
+  script:
+#    - docker login -u user--password passwprd
+    - docker build . -t ap:$CI_COMMIT_SHORT_SHA
+  only:
+    - dev
+  tags:
+    - stage
+
+delpoy_staging:
+  stage: deploy
+  variables:
+    APP_ENV: "staging"
+  script:
+    - docker-compose up -d --build
+  only:
+    - dev
+  tags:
+    - stage

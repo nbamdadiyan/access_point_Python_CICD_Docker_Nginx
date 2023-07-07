@@ -1,0 +1,59 @@
+stages:
+- buildJar
+- buildDockerfile
+- release
+- deploy
+
+variables:
+  TEST_IMAGE: registry.uid.ir/uid/authentication-api:$CI_COMMIT_REF_NAME
+  RELEASE_IMAGE: registry.uid.ir/uid/authentication-api
+  IMAGE_TAG: $CI_COMMIT_TAG
+  #DOCKER_DRIVER: overlay2
+
+
+build-jarfile-staging:
+  #image: openjdk:8-jdk-alpine
+  stage: buildJar
+  tags:
+    - build
+  artifacts:
+    paths:
+      - ./target/authentication-api-*.jar
+    expire_in: 1 week
+
+  script:
+    - java -version
+    - ls -lah
+    - mvn clean install -DskipTests    
+    - ls -lah ./target
+  only:
+    - develop
+
+build-dockerfile-staging:
+  stage: buildDockerfile
+  tags:
+    - build
+  script:
+    - whoami
+    - docker login -u pishro -p $REGISTRY_PASS registry.uid.ir
+    - docker build -t $TEST_IMAGE .
+    - docker push $TEST_IMAGE
+  only:
+    - develop
+
+
+deploy-dockerfile-demo:
+  before_script:
+    - ls
+  stage: deploy
+  tags:
+    - demo
+  script:
+    - docker rm -f authentication-api || true
+    - docker login -u pishro -p $REGISTRY_PASS registry.uid.ir
+    - docker pull $TEST_IMAGE
+    - docker-compose -f docker-compose.tst.yml up -d
+    - docker ps
+    - ls 
+  only:
+    - develop

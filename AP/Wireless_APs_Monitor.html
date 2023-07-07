@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+			html,body{
+                height:100%;
+                width:100%;
+			}
+			#ip_input{
+                height:40px;
+                width:100px;
+                padding-left:10px;
+                display:block;
+                margin:3px auto;
+            }
+           	 #wireless_log{
+                height:400px;
+                width:700px;
+				border:1px solid black;
+                overflow-y:scroll;
+				color:black;
+                margin:auto;
+				font-size:20px;
+            }
+			#myHeader {
+				background-color: LightGray;
+				color: black;
+				padding:5px;
+				font-size:30px;
+				text-align: center;
+			}
+			#btn{
+                height:30px;
+                width:100px;
+                display:block;
+                font-size:20px;
+				border:1px solid black;
+            }
+        </style>
+		<title>Wireless APs Monitor</title>
+    </head>
+    <body style="background-color:LightGray;">
+		<h1 id="myHeader">Wireless APs Monitor Information</h1>
+		<form>
+            Enter Name:  <input id="name" placeholder="Enter name"></input>
+			<h2 style="font-size:20px;">Enter IP and Port to connect Server</h2>
+            <p>
+            Enter IP: <input id="ip" placeholder="Enter IP" size="10">
+            <br><br>
+			Enter Port: <input id="port" placeholder="Enter Port" size="5">
+            <br>
+            </p>
+			<h2 style="font-size:20px;">Would like to Enable/Disable Logging</h2>
+		    <p>
+            <label><input type="radio" name="Logging" value="logging_on">Enable</label>
+            <label><input type="radio" name="Logging" value="logging_off">Disable</label>
+            </p>
+       	</form>
+        <button id="btn" onclick="websocket_creation()">Connect</button>
+	    <h2 style="font-size:20px;">Wireless APs Monitor Logs</h2>
+		<div id="wireless_log"></div>
+		
+        <script>
+            var monitor_window = document.getElementById("wireless_log");
+			function websocket_creation() {
+			    var name = document.getElementById("name").value;
+			    var ip = document.getElementById("ip").value;
+		        var port = document.getElementById("port").value;
+		        var radioValue = document.querySelector('input[name="Logging"]:checked').value;
+
+				var ws = new WebSocket("ws://" + ip + ":" + port);
+				ws.onopen = function(event) {
+                    ws.send(name)
+                    ws.send(radioValue)
+                }
+
+				// Add new messages to message view
+                ws.onmessage = function(message){
+                    monitor_window.innerHTML += ('<p>' + message.data + '</p>')
+                    monitor_window.scrollTop = monitor_window.scrollHeight;
+                    console.log(message.data );
+                }
+			}
+        </script>
+    </body>
+</html>
+
+
+

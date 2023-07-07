@@ -1,0 +1,7 @@
+simplejson
+pytest-shutil
+deepdiff
+watchdog
+websockets
+asyncio
+regex
